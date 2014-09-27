@@ -36,6 +36,7 @@ Capybara.default_driver = :appium
 ## Capybara server
 appium_capybara driver automatically starts a Rails server in `test` environment.
 
+### Server binding
 By default Capybara starts this web server listening to localhost only and on a random port. It is advised
 to force Capybara to listen to all interface and listen to a specific port, and set this server address
 in your mobile application.
@@ -43,6 +44,18 @@ in your mobile application.
 ```ruby
 Capybara.server_host = '0.0.0.0' # Listen to all interfaces
 Capybara.server_port = 56844     # Open port TCP 56844, change at your convenience
+```
+
+### Do not use WEBrick
+WEBrick can be very slow with some emulator or real device, which can generate up to 10 seconds of delay 
+on each request. Using another server, such as Thin, fixes that problem. After installing Thin, add the
+following to your spec_helper
+
+```ruby
+Capybara.server do |app, port|
+  require 'rack/handler/thin'
+  Rack::Handler::Thin.run(app, :Port => port)
+end
 ```
 
 ## Publishing to rubygems
